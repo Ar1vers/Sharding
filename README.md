@@ -1,48 +1,49 @@
-# Сервис шардирования баз данных
+# Database Sharding Service
 
-## Обзор проекта
+## Project Overview
 
-Данный проект представляет собой реализацию системы **горизонтального шардирования баз данных** на основе **Spring Boot**. Система разработана для эффективного распределения данных пользователей между несколькими экземплярами PostgreSQL, что обеспечивает:
+This project implements a **horizontal database sharding** system based on **Spring Boot**. The system is designed to efficiently distribute user data across multiple PostgreSQL instances, providing:
 
-- Повышенную производительность
-- Масштабируемость приложения
-- Отказоустойчивость
+- Enhanced performance
+- Application scalability
+- Fault tolerance
 
-## Реализованная функциональность
+## Implemented Functionality
 
-### Механизм горизонтального шардирования
-- Распределение данных между **тремя независимыми шардами** PostgreSQL
-- Динамическая маршрутизация запросов на соответствующий шард
+### Horizontal Sharding Mechanism
+- Data distribution across **three independent PostgreSQL shards**
+- Dynamic request routing to appropriate shards
 
-### Инфраструктура баз данных
-- Настройка трех экземпляров PostgreSQL с использованием **Docker Compose**
-- Конфигурация соединений для каждого шарда с индивидуальными настройками
+### Database Infrastructure
+- Configuration of three PostgreSQL instances using **Docker Compose**
+- Individual connection settings for each shard
 
-### Архитектура маршрутизации
-- Реализация `AbstractRoutingDataSource` для динамического переключения между источниками данных
-- Использование `ThreadLocal` для сохранения контекста текущего шарда
+### Routing Architecture
+- Implementation of `AbstractRoutingDataSource` for dynamic data source switching
+- Use of `ThreadLocal` to maintain current shard context
 
-### Алгоритм распределения данных
-- Определение шарда на основе **UUID пользователя** (метод суммирования символов)
-- Распределение запросов по модулю от количества шардов
+### Data Distribution Algorithm
+- Shard determination based on **user UUID** (character sum method)
+- Request distribution using modulo operation on shard count
 
-### REST API для работы с данными
-- `POST /users` - создание пользователей с автоматическим определением шарда
-- `GET /users` - получение списка всех пользователей (объединение данных из всех шардов)
-- `GET /users/{id}` - поиск пользователя с маршрутизацией в соответствующий шард
+### REST API Endpoints
+- `POST /users` - Create users with automatic shard determination
+- `GET /users` - Retrieve all users (aggregating data from all shards)
+- `GET /users/{id}` - Find specific user with routing to correct shard
 
-### Управление транзакциями
-- Корректная обработка транзакций в контексте распределенных БД
-- Обеспечение целостности данных при работе с несколькими источниками
+### Transaction Management
+- Proper transaction handling in distributed database context
+- Data integrity assurance across multiple data sources
 
-**Алгоритм шардирования:**
-1. Для каждого пользователя вычисляется сумма кодов символов его UUID
-2. Результат делится по модулю на количество шардов
-3. Определяется целевой шард (0, 1 или 2)
-4. Запрос динамически перенаправляется в соответствующую БД
+**Sharding Algorithm:**
+1. Calculate sum of character codes from user's UUID
+2. Apply modulo operation with shard count
+3. Determine target shard (0, 1 or 2)
+4. Dynamically route request to appropriate database
 
-### Преимущества подхода
-✅ Масштабируемость - возможность добавления новых шардов при росте объема данных
-✅ Производительность - распределение нагрузки между несколькими БД
-✅ Отказоустойчивость - проблемы в одном шарде не влияют на другие
-✅ Гибкость - возможность модификации стратегии шардирования
+# Key Advantages
+1. Scalability - Ability to add new shards as data grows
+2. Performance - Load distribution across multiple databases
+3. Fault Isolation - Issues in one shard don't affect others
+4. Flexibility - Modifiable sharding strategy
+![deepseek_mermaid_20250425_f2a1d7](https://github.com/user-attachments/assets/7dc0c311-6dbe-42c1-9b20-1747deea0011)
